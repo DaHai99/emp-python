@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑</title>
+    <link href="/static/css/commons.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<form id="emp_from" method="post" action="{{ url }}">
+    {% csrf_token %}
+    <label for="empno">员工号：</label>
+    <input id="empno" name="empno" type="text" value="{{ data.empno }}" title="员工号" placeholder="员工号"
+            {{ readonly }}/><br/>
+    <label for="ename">员工姓名：</label>
+    <input id="ename" name="ename" type="text" value="{{ data.ename }}" title="员工姓名" placeholder="员工姓名"/><br/>
+    <label for="job">工作：</label>
+    <input id="job" name="job" type="text" value="{{ data.job }}" title="工作" placeholder="工作"/><br/>
+    <label for="mgr">上级编号：</label>
+    <input id="mgr" name="mgr" type="text" value="{{ data.mgr }}" title="上级编号" placeholder="上级编号"/><br/>
+    <label for="hiredate">受雇日期：</label>
+    <input id="hiredate" name="hiredate" class="sang_Calender" type="text"
+           value="{{ data.hiredate|date:'Y-m-d H:i:s' }}" title="受雇日期"
+           placeholder="受雇日期"/><br/>
+    <label for="sal">薪金：</label>
+    <input id="sal" name="sal" type="text" value="{{ data.sal }}" title="薪金" placeholder="薪金"/><br/>
+    <label for="comm">佣金：</label>
+    <input id="comm" name="comm" type="text" value="{{ data.comm }}" title="佣金" placeholder="佣金"/><br/>
+
+    <label for="dept">部门：</label>
+    <select id="dept" name="deptno" style="width: 160px;">
+        <option value="{{ data.deptno.deptno }}">{{ data.deptno.dname }}</option>
+    </select><br/>
+    <input type="reset" value="重置"/>
+    <input type="submit" value="提交"/>
+
+    <script type="text/javascript" src="/static/js/datetime.js"></script>
+    <script type="text/javascript" src="/static/js/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    xhr.setRequestHeader('X-CSRFtoken', $.cookie('csrftoken'))
+                }
+            });
+            $.ajax({
+                url: '/app01/emp_ajax/',
+                type: 'POST',
+                data: null,
+                success: function (data) {
+                    var obj = JSON.parse(data);
+                    $('#dept').html('');
+                    $("#dept").html('<option value="-1">--请选择--</option>');
+                    for (var i = 0; i < obj.length; i++) {
+                        $("#dept").html($('#dept').html() + '<option value=' + obj[i].pk + '>' + obj[i].fields.dname + '</option>');
+                    }
+                    var proCodeOption = $("option");
+                    for (var i = 0; i < proCodeOption.length; i++) {
+                        if (proCodeOption.eq(i).val() == {{ deptno }}) {
+                            proCodeOption.eq(i).attr("selected", true);
+                        }
+                    }
+                }
+            });
+        };
+    </script>
+</form>
+</body>
+</html>
